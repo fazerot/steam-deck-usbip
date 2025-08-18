@@ -14,9 +14,9 @@ On the Steam Deck:
    passwd deck
    ```
 
-4. Enable writing to the Steam Deck's filesystem:
+4. Set the Steam Deck to developer mode (this is required to run the scripts):
    ```bash
-   sudo steamos-readonly disable
+   sudo steamos-devmode enable
    ```
 
 5. Install `usbip` tools and `git`:
