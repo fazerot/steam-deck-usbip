@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#auto-update path so sudo access to dialogrc works
 DIALOGRC="$HOME/steam-deck-usbip/dialogrc"
 
 DIALOG_HEIGHT=20
@@ -91,12 +92,16 @@ cleanup() {
 trap cleanup SIGINT SIGTERM SIGHUP EXIT
 
 # Exit confirmation dialog
-DIALOGRC=$DIALOGRC dialog --title "Exit Confirmation" --yesno "Are you sure you want to exit?" $DIALOG_HEIGHT $DIALOG_WIDTH
-if [ $? -eq 0 ]; then
-  cleanup
-else
-  DIALOGRC=$DIALOGRC dialog --msgbox "Continuing..." $DIALOG_HEIGHT $DIALOG_WIDTH
-fi
+while true; do
+  DIALOGRC=$DIALOGRC dialog --title "Exit Confirmation" --yesno "Are you sure you want to exit?" $DIALOG_HEIGHT $DIALOG_WIDTH
+  rc=$?
+  if [ "$rc" -eq 0 ]; then
+    cleanup
+  else
+    # Show "Continuing..." for 10 seconds then return to confirmation
+    DIALOGRC=$DIALOGRC dialog --timeout 10 --msgbox "Continuing..." $DIALOG_HEIGHT $DIALOG_WIDTH
+  fi
+done
 
 # Main loop: wait for a stop signal from client
 while true; do
