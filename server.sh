@@ -2,16 +2,19 @@
 
 DIALOGRC="$HOME/steam-deck-usbip/dialogrc"
 
+DIALO_HEIGHT=20
+DIALO_WIDTH=100
+
 # Ensure script is run as root
 if [ "$EUID" -ne 0 ]; then
-  DIALOGRC=$DIALOGRC dialog --msgbox "Please run as root." 100 300
+  DIALOGRC=$DIALOGRC dialog --msgbox "Please run as root." $DIALOG_HEIGHT $DIALOG_WIDTH
   exit 1
 fi
 
 # Get local IP address (prefer wlan0 or eth0)
 LOCAL_IP=$(ip -4 addr show scope global | grep inet | awk '{print $2}' | cut -d/ -f1 | head -n 1)
 if [ -z "$LOCAL_IP" ]; then
-  DIALOGRC=$DIALOGRC dialog --msgbox "Could not determine local IP address." 100 300
+  DIALOGRC=$DIALOGRC dialog --msgbox "Could not determine local IP address." $DIALOG_HEIGHT $DIALOG_WIDTH
   exit 1
 fi
 
@@ -23,20 +26,20 @@ modprobe usbip_host
 STEAM_BUSID=$(usbip list -l | grep -B 1 "28de:" | grep "busid" | awk '{print $3}')
 
 if [ -z "$STEAM_BUSID" ]; then
-  DIALOGRC=$DIALOGRC dialog --msgbox "Steam Controller not found." 100 300
+  DIALOGRC=$DIALOGRC dialog --msgbox "Steam Controller not found." $DIALOG_HEIGHT $DIALOG_WIDTH
   exit 1
 fi
 
-DIALOGRC=$DIALOGRC dialog --infobox "Steam Controller found successfully." 100 300
+DIALOGRC=$DIALOGRC dialog --infobox "Steam Controller found successfully." $DIALOG_HEIGHT $DIALOG_WIDTH
 sleep 1
 
 # Bind the Steam Controller to usbip
-DIALOGRC=$DIALOGRC dialog --infobox "Binding Steam Controller..." 100 300
+DIALOGRC=$DIALOGRC dialog --infobox "Binding Steam Controller..." $DIALOG_HEIGHT $DIALOG_WIDTH
 usbip bind -b "$STEAM_BUSID"
 
 # Start usbip daemon if not already running
 if ! pgrep usbipd > /dev/null; then
-  DIALOGRC=$DIALOGRC dialog --infobox "Starting usbipd..." 100 300
+  DIALOGRC=$DIALOGRC dialog --infobox "Starting usbipd..." $DIALOG_HEIGHT $DIALOG_WIDTH
   usbipd -D
 fi
 
@@ -48,7 +51,7 @@ Steam Deck IP: $LOCAL_IP
 On your client machine, run:
   sudo usbip list -r $LOCAL_IP
 Then connect with:
-  sudo usbip attach -r $LOCAL_IP -b $STEAM_BUSID" 100 300
+  sudo usbip attach -r $LOCAL_IP -b $STEAM_BUSID" $DIALOG_HEIGHT $DIALOG_WIDTH
 
 # Brightness control setup
 BRIGHTNESS_PATH="/sys/class/backlight/amdgpu_bl0/brightness"
@@ -64,11 +67,11 @@ if [ -w "$BRIGHTNESS_PATH" ]; then
 fi
 # Cleanup function
 cleanup() {
-  DIALOGRC=$DIALOGRC dialog --infobox "Unbinding USB device..." 100 300
+  DIALOGRC=$DIALOGRC dialog --infobox "Unbinding USB device..." $DIALOG_HEIGHT $DIALOG_WIDTH
   usbip unbind -b "$STEAM_BUSID" 2>/dev/null
   sleep 1
 
-  DIALOGRC=$DIALOGRC dialog --infobox "Stopping usbipd..." 100 300
+  DIALOGRC=$DIALOGRC dialog --infobox "Stopping usbipd..." $DIALOG_HEIGHT $DIALOG_WIDTH
   killall usbipd 2>/dev/null
   sleep 1
 
@@ -79,7 +82,7 @@ cleanup() {
 
   clear
   setterm --cursor on
-  DIALOGRC=$DIALOGRC dialog --msgbox "Server stopped. Exiting." 100 300
+  DIALOGRC=$DIALOGRC dialog --msgbox "Server stopped. Exiting." $DIALOG_HEIGHT $DIALOG_WIDTH
   
   exit 0
 }
@@ -88,17 +91,17 @@ cleanup() {
 trap cleanup SIGINT SIGTERM SIGHUP EXIT
 
 # Exit confirmation dialog
-DIALOGRC=$DIALOGRC dialog --title "Exit Confirmation" --yesno "Are you sure you want to exit?" 100 300
+DIALOGRC=$DIALOGRC dialog --title "Exit Confirmation" --yesno "Are you sure you want to exit?" $DIALOG_HEIGHT $DIALOG_WIDTH
 if [ $? -eq 0 ]; then
   cleanup
 else
-  DIALOGRC=$DIALOGRC dialog --msgbox "Continuing..." 100 300
+  DIALOGRC=$DIALOGRC dialog --msgbox "Continuing..." $DIALOG_HEIGHT $DIALOG_WIDTH
 fi
 
 # Main loop: wait for a stop signal from client
 while true; do
   if [ -f /tmp/stop_usbip_server ]; then
-    DIALOGRC=$DIALOGRC dialog --infobox "Stop signal received from client." 100 300
+    DIALOGRC=$DIALOGRC dialog --infobox "Stop signal received from client." $DIALOG_HEIGHT $DIALOG_WIDTH
     rm -f /tmp/stop_usbip_server
     cleanup
   fi
