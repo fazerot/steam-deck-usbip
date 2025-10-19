@@ -24,7 +24,7 @@ tab_len = 0
 visit_items = ON
 
 # Show scrollbar in dialog boxes?
-use_scrollbar = ON
+use_scrollbar = OFF
 
 # Shadow dialog boxes? This also turns ON color.
 use_shadow = ON
