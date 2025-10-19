@@ -2,8 +2,8 @@
 
 DIALOGRC="$HOME/steam-deck-usbip/dialogrc"
 
-DIALO_HEIGHT=20
-DIALO_WIDTH=100
+DIALOG_HEIGHT=20
+DIALOG_WIDTH=100
 
 # Ensure script is run as root
 if [ "$EUID" -ne 0 ]; then
