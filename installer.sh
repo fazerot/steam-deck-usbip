@@ -84,7 +84,7 @@ if [ "$device_type" = "s" ]; then
 
 elif [ "$device_type" = "c" ]; then 
     if command -v pacman &> /dev/null; then
-        sudo pacman -S --noconfirm usbip git 
+        sudo pacman -Sy --noconfirm usbip git 
     elif command -v apt &> /dev/null; then
         sudo apt install -y linux-tools-generic usbip git  
     elif command -v dnf &> /dev/null; then
@@ -93,8 +93,6 @@ elif [ "$device_type" = "c" ]; then
         echo "Unsupported distribution. Please install usbip and git manually."
         exit 1
     fi
-        fi
-        
     
     echo ""
     echo "Client setup complete! Starting client script..."
